@@ -109,6 +109,31 @@
 </section>
 ```
 
+### 篩選器
+
+在管道符號後加上篩選器：`{{ title | upper }}`、`{{ text | truncate:80 }}`、`{{ price | default:'—' }}`、`{{ date | date:'d/m/Y' }}`，可串接：`{{ name | trim | capitalize }}`。
+
+| 篩選器 | 效果 |
+| :--- | :--- |
+| `upper`、`lower`、`capitalize`、`trim` | 大小寫／空白處理。 |
+| `truncate:N` | 取前 N 個字元並加上 `…`。 |
+| `default:'x'` | 值不存在或為空時使用。 |
+| `date:'fmt'` | 格式化日期或時間戳（PHP 日期格式；編輯器預覽使用瀏覽器的日期樣式）。 |
+| `length` | 文字的字元數或清單的項目數。 |
+| `json` | 值（清單、物件）的 JSON 文字。 |
+
+輸出一律會跳脫。篩選器在編輯器預覽與前台皆有效。
+
+### 單一欄位的字體排印與間距
+
+在綁定的文字、標題或連結上加入 `data-typography` 和／或 `data-spacing`，即可為該欄位提供與原生相同風格的控制項：
+
+```html
+<h2 data-bind="title" data-typography="size, weight, line-height, letter-spacing, transform" data-spacing="margin, padding">標題</h2>
+```
+
+在編輯器中選取該元素，側邊欄會顯示 **字體排印** 與 **間距** 面板。選擇結果存於 `<key>_style`（因此以 `_style` 結尾的鍵為保留字），並透過 WordPress 樣式引擎輸出為行內樣式；`var:preset|spacing|40` 之類的預設值會像核心區塊一樣解析。只接受已知屬性與安全的值（帶 px/rem/em/%/vw/vh/ch 的數字、預設值參照、CSS 變數、`clamp()`／`min()`／`max()`／`calc()`）。沒有這些屬性的元素不受影響。
+
 ## 6. 條件與迴圈
 
 | 指令 | 用途 |
@@ -122,7 +147,13 @@
 
 運算式：真假值、`!x`、點號路徑、`==`、`!=`、`===`、`!==`（以文字比較）、`<`、`>`、`<=`、`>=`（兩側皆為數字時以數值比較）、`a in 'x,y,z'`（逗號清單或陣列）、`&&`、`||` 與括號：`data-if="count > 3 && (lang == 'vi' || lang == 'en')"`。優先順序：`||`、`&&`、比較、`!`。迴圈範圍：`index`、`is_first`、`is_last`（或你自訂的別名，例如 `crumb.is_last`）。可用 `<template data-for>` 作為透明的外層包裝。
 
-## 7. 宣告式元件
+### 部分範本、變體與範本檢查
+
+- **部分範本：**`<include src="button" />` 會被 `blocks/_partials/button.html` 取代（先找範本旁邊，再找上一層資料夾；只允許字母、數字、`-`、`_`、`/`；最多巢狀 3 層）。只需編輯一次部分範本，所有引用它的區塊都會跟著更新。
+- **變體：**`<template data-variation="dark" data-title="深色">{"title":"深色主視覺"}</template>` 會新增一個帶有這些屬性值的插入器變體。JSON 必須有效；該 template 不會出現在輸出中。
+- **範本檢查：**在 **區塊 → 範本檢查與使用情形** 中，依區塊列出指令的拼字錯誤（例如 `data-suports`）、找不到的部分範本、無效的變體、重複的側邊欄鍵、沒有迴圈的 `data-for-empty`，以及使用該區塊的頁面。`wp refinelab blocks-lint` 會輸出相同內容。
+
+## 7.## 7. 宣告式元件
 
 | 屬性 | 行為 |
 | :--- | :--- |
@@ -139,6 +170,10 @@
     <textarea-control data-bind="k" rows="3"></textarea-control>
     <toggle-control data-bind="k" default="true"></toggle-control>
     <range-control data-bind="k" min="0" max="100" default="40"></range-control>
+    <number-control data-bind="k" min="0" max="50" step="1" default="3"></number-control>
+    <radio-control data-bind="k" default="m"><option value="s">小</option><option value="m">中</option></radio-control>
+    <date-control data-bind="k" default="2026-11-17"></date-control>
+    <image-control data-bind="k"></image-control> <!-- 圖片網址存於 "k"，附件 ID 存於 "k_id" -->
     <select-control data-bind="k" default="3"><select-control-option value="3">3</select-control-option></select-control>
     <color-picker data-bind="k" default="#fff"></color-picker>
     <link-control data-bind="k"></link-control>
@@ -165,7 +200,10 @@
 | :--- | :--- |
 | `site` | `name`、`description`、`url`、`admin_url`、`language`、`charset`、`theme` |
 | `context` | `title`、`slug`、`url`、`type`、`post_type`、`id`、`is_front_page`、`is_home`、`is_single`、`is_page`、`is_archive`、`is_category`、`is_tag`、`is_tax`、`is_search`、`is_404`、`paged` |
-| `post` | `id`、`title`、`slug`、`type`、`url`、`excerpt`、`date`、`thumbnail`、`author` |
+| `post` | `id`、`title`、`slug`、`type`、`url`、`excerpt`、`date`、`thumbnail`、`author`、`meta`（文章的公開自訂欄位，純量值，最多 100 筆）、`terms`（name、slug、taxonomy、url） |
+| `menu` | `menu.<位置>`：指派到佈景主題位置的選單，樹狀結構，含 `title`、`url`、`target`、`is_current`、`children` |
+| `query` | 篩選器 `refinelab_html_blocks_query_params` 允許的網址參數（預設 `s`、`paged`、`lang`、`cat`、`tag`、`orderby`），純文字，最多 100 字元 |
+| `options` | 僅限篩選器 `refinelab_html_blocks_option_keys` 指定的選項（預設無），純量值 |
 | `posts` | 最近／查詢到的文章物件 |
 | `term`、`terms` | 查詢到的詞彙；分類清單 |
 | `languages` | 語言清單：`code`、`name`、`flag`、`url`、`is_current`、`label` |

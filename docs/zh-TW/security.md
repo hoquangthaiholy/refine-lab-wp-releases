@@ -36,7 +36,23 @@
 | `alert_admin_change` | 新增管理員，或使用者被授予管理員角色。 |
 | `alert_plugin_change` | 外掛被啟用、停用、刪除，或切換佈景主題。 |
 
-## 登入防護
+## 密碼與工作階段
+
+| 金鑰 | 值 | 行為 |
+| :--- | :--- | :--- |
+| `password_min_length` | `0`（WordPress 預設）、8、10、12、14、16 | 新密碼的最小長度。 |
+| `password_require_mix` | 開／關 | 小寫、大寫、數字、符號至少三種。 |
+| `password_hibp` | 開／關 | 拒絕出現在 Pwned Passwords 清單中的密碼。僅傳送 SHA-1 雜湊的前 5 個字元（k-匿名），絕不傳送密碼；若無法連線服務則接受該密碼。 |
+| `idle_logout_minutes` | `0`（從不）、15、30、60、120、240、480 | 可編輯內容的使用者在此時間內沒有頁面請求就登出（Heartbeat 不算）。記錄於使用者中繼資料 `_refinelab_last_seen`，每分鐘最多寫入一次。 |
+| `max_sessions` | `0`（不限）、1、2、3、5 | 登入時，超過上限的最舊工作階段會被結束。 |
+
+密碼規則適用於在個人資料中設定密碼、新增使用者畫面與密碼重設；既有密碼不受影響。同一張卡片上有 **登出我所有的其他工作階段**。
+
+## 內容安全政策（CSP）
+
+`csp_mode`：`off`、`report_only`（標頭 `Content-Security-Policy-Report-Only`，不會阻擋任何內容）或 `enforce`。`csp_preset`：`relaxed`（允許行內指令碼與 HTTPS 來源）、`strict`（僅限同站、無行內指令碼）或 `custom`（`csp_custom`，以分號分隔的純指令）。僅在前台請求送出。瀏覽器會將違規回報到 `POST /wp-json/refinelab/v1/csp-report`（本質上是公開的：每小時最多 120 筆、移除查詢字串、`refinelab_csp_reports` 中最多保留 50 組不同的指令／位址）；清單顯示在「安全性」頁面。請先用僅回報模式，調整政策直到清單不再增加，再啟用強制執行。
+
+## 登入防護## 登入防護
 
 | 鍵 | 預設 | 行為 |
 | :--- | :--- | :--- |
@@ -67,6 +83,10 @@
 - 儲存：使用者中繼資料 `_refinelab_2fa_{enabled,secret,pending,recovery,last_step}`。密鑰以 libsodium 加密，金鑰由 `AUTH` salt 衍生；**更換 salt 會使已登錄的密鑰失效**（使用者必須使用復原碼或由管理員重設）。復原碼以 HMAC 雜湊儲存。
 - 驗證碼提示是登入表單上的一個欄位，而不是第二個畫面，因此錯誤或缺少驗證碼會透露密碼是正確的。應用程式密碼與 REST cookie 驗證不經過登入表單，不受影響（如有需要請另外停用應用程式密碼）。
 - **復原**：在 `wp-config.php` 將 `REFINELAB_DISABLE_2FA` 定義為 `true`，即可略過所有雙重驗證檢查並隱藏相關介面。
+
+### 依角色要求兩步驟驗證
+
+`twofactor_required_roles`（角色）、`twofactor_grace_days`（0、3、7、14、30）與 `twofactor_required_since`（首次選擇角色時設定）。具有這些角色但尚未設定兩步驟驗證的使用者，在寬限期結束前只會看到提醒；之後除了個人資料、`admin-post.php` 與 `admin-ajax.php` 外，所有後台畫面都會導向個人資料，直到設定完成。需要啟用 `two_factor_enabled`。若所有人都被鎖在外面，可在 wp-config.php 定義 `REFINELAB_DISABLE_2FA` 以關閉強制要求。不提供電子郵件一次性驗證碼。
 
 ### 自訂登入網址
 

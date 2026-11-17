@@ -28,6 +28,23 @@ Unlike the options above these also apply in the admin. Defaults keep WordPress 
 | `revisions_limit` | `default`, `0`, `3`, `5`, `10`, `25`, `50` | `wp_revisions_to_keep`. **Delete old revisions** removes the oldest beyond the limit (up to 2000 per click; logged as `revisions_cleaned`). |
 | `autosave_interval` | `default`, `120`, `300`, `600` seconds | Block-editor autosave interval. |
 
+### Resource hints and database tools (Refine Lab → Performance)
+
+| Key / tool | Effect |
+| :--- | :--- |
+| `preconnect_hosts` | One address per line (max 6); each becomes `<link rel="preconnect">` through `wp_resource_hints`. |
+| `fonts_swap` | Adds `display=swap` to Google Fonts stylesheets that lack `display=`. |
+| Database cleanup | Counts and removes expired transients, post meta of deleted posts, spam and trashed comments, auto-drafts older than 7 days (up to 1,000 rows per kind per click; logged as `db_cleaned`). Back up first. |
+| Autoloaded options | Total size and the 20 largest autoloaded options. **Stop autoloading** sets one option to not autoload (`wp_set_option_autoload`, logged as `autoload_off`); core options are protected. |
+
+| Key | Effect |
+| :--- | :--- |
+| `speculation` | `off`, `conservative` (prefetch on press) or `moderate` (on hover): prints Speculation Rules that let Chromium browsers prefetch the next page. Not for signed-in users; admin, login, upload and nonce URLs and `rel=nofollow` links are excluded. Replaces core's rules. |
+| `dequeue_handles` | Script / style handles removed for signed-out visitors (up to 30). Check pages after adding one. |
+| `strip_core_ver` | Removes `?ver=` from asset URLs when it equals the WordPress version. |
+
+The page also lists nginx and Apache snippets for compression and long browser caching (server rules cannot be set from PHP).
+
 ### Site Health
 
 Refine Lab adds four tests to **Tools → Site Health** (recent backup, mail delivery, file integrity, uploads protection) and a "Refine Lab" section to Debug Info (version, enabled modules, backups kept). They only read stored results.
@@ -133,7 +150,38 @@ Who did what, in the table `{prefix}refinelab_activity`. Settings (`refinelab_ac
 
 Events: login, failed login, two-factor locked, plugin activated / deactivated, theme switched, settings changed, content published, backup created / restored, full backup created / downloaded / uploaded / restored, settings exported / imported, integrity scan, integrity baseline set, maintenance mode changed, translations created. Filter by event, export CSV, clear with confirmation.
 
+## Diagnostics (Refine Lab → Tools → Diagnostics)
+
+- **Scheduled events (cron):** every event with its next run; *Run now* runs it once (it stays scheduled), *Delete* removes a non-core event (core `wp_*` events are protected). Events more than 10 minutes late are flagged, with a hint about real server cron. Logged as `cron_run` / `cron_deleted`.
+- **Debug log:** the last 200 lines of `debug.log` (filter by text, download, empty). Only available when `WP_DEBUG_LOG` is on and the file is inside wp-content or the WordPress folder.
+- **E-mail log** (off by default, option `refinelab_maillog_settings`): remembers the last 100 mails (time, recipient, subject, result, error) in `refinelab_maillog`. The message body is never stored, so there is no resend.
+
+## Search & replace (Refine Lab → Tools → Search & replace)
+
+Replaces text in every table of this site that has a single-column primary key (the `guid` column is skipped), including inside serialized data (lengths are fixed, nothing is unserialized). Tick *site address* to also match http/https, protocol-relative and JSON-escaped forms and to stop at the end of the host name. Always run the **dry run** first (leave *Apply* unchecked): it counts matching rows per table without writing. A run stops after about 20 seconds and offers **Continue**. Back up before applying; logged as `db_replaced`.
+
+## Admin bar
+
+Administrators get a **Refine Lab** menu: clear the blocks cache, turn maintenance mode on or off (a dot shows when it is on), open Backup & restore and Diagnostics.
+
+## WP-CLI## WP-CLI
+
+| Command | Does |
+| :--- | :--- |
+| `wp refinelab status` | Version, enabled modules, backups, schedule, integrity. |
+| `wp refinelab backup-create [--components=database,uploads,plugins,themes] [--note=…]` | Full-site backup in one process. |
+| `wp refinelab backup-list [--format=json]`, `backup-delete <id>` | List / delete backups. |
+| `wp refinelab integrity-scan` | Scan core, plugin and theme files. |
+| `wp refinelab cache-clear` | Clear the HTML blocks cache. |
+| `wp refinelab db-clean [--kinds=transients,spam] [--dry-run]` | Database cleanup (loops until nothing is left). |
+| `wp refinelab autoload [--limit=20]` | Largest autoloaded options. |
+| `wp refinelab blocks-lint` | Template warnings and where each HTML block is used (exit code 1 when there are warnings). |
+
 ## Block history (editor)
+
+Block editor shortcuts for theme blocks: the **Visibility** panel hides a block on mobile (under 600px), tablet (600–959px) or desktop (960px and up) with the classes `refinelab-hide-mobile|tablet|desktop` (attribute `refinelabHide`); the block's options menu has **Copy block settings** / **Paste block settings** (same block type); **Show block outlines** (More menu or command palette) outlines blocks and bound fields. The command palette (Ctrl/Cmd+K) also offers clearing the blocks cache and opening Backup and Diagnostics.
+
+The document sidebar also has an **Accessibility check** panel: it scans the canvas for images without alt text, links without a name, skipped or duplicate heading levels and empty headings, and clicking an item selects the block (manual re-check, no background scanning).
 
 Each time a post is saved, the attributes of every `theme/*` block are snapshotted in the post meta `_refinelab_block_history` (up to 20 snapshots / 400 KB per post). In the block sidebar, **Block history** lists earlier states of the selected block; *Restore* rolls it back, and the change is undone like any edit. See the REST route in [hooks-and-api.md](hooks-and-api.md).
 

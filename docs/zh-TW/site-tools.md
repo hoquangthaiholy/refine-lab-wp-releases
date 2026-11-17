@@ -28,6 +28,23 @@
 | `revisions_limit` | `default`、`0`、`3`、`5`、`10`、`25`、`50` | `wp_revisions_to_keep`。**刪除舊修訂版本**會刪除超過上限的最舊版本（每次最多 2000 筆；記錄為 `revisions_cleaned`）。 |
 | `autosave_interval` | `default`、`120`、`300`、`600` 秒 | 區塊編輯器自動儲存間隔。 |
 
+### 資源提示與資料庫工具（Refine Lab → 效能）
+
+| 金鑰／工具 | 效果 |
+| :--- | :--- |
+| `preconnect_hosts` | 每行一個位址（最多 6 個）；透過 `wp_resource_hints` 輸出為 `<link rel="preconnect">`。 |
+| `fonts_swap` | 為缺少 `display=` 的 Google Fonts 樣式表加上 `display=swap`。 |
+| 資料庫清理 | 統計並移除過期暫存、已刪除文章的中繼資料、垃圾與回收桶留言、超過 7 天的自動草稿（每次每類最多 1,000 筆；記錄為 `db_cleaned`）。請先備份。 |
+| 自動載入的選項 | 總大小與最大的 20 個自動載入選項。**停止自動載入**會將該選項設為不自動載入（`wp_set_option_autoload`，記錄為 `autoload_off`）；核心選項受保護。 |
+
+| 金鑰 | 效果 |
+| :--- | :--- |
+| `speculation` | `off`、`conservative`（按下時預取）或 `moderate`（滑過時預取）：輸出 Speculation Rules，讓 Chromium 瀏覽器預取下一頁。不適用於已登入的使用者；後台、登入、上傳與含 nonce 的網址以及 `rel=nofollow` 連結會被排除。會取代核心的規則。 |
+| `dequeue_handles` | 對未登入訪客移除的指令碼／樣式控制代碼（最多 30 個）。新增後請檢查頁面。 |
+| `strip_core_ver` | 當資源網址的 `?ver=` 等於 WordPress 版本時將其移除。 |
+
+此頁面也提供壓縮與長效瀏覽器快取的 nginx 與 Apache 範本（伺服器規則無法由 PHP 設定）。
+
 ### 網站健康
 
 Refine Lab 在 **工具 → 網站健康** 新增四項檢測（近期備份、郵件寄送、檔案完整性、uploads 防護），並在「偵錯資訊」加入「Refine Lab」區段（版本、啟用的模組、保留的備份數）。這些檢測只讀取已儲存的結果。
@@ -133,7 +150,38 @@ source,target,type,match
 
 事件：登入、登入失敗、雙重驗證鎖定、外掛啟用／停用、切換佈景主題、設定變更、內容發佈、備份建立／還原、完整備份建立／下載／上傳／還原、設定匯出／匯入、完整性掃描、完整性基準設定、維護模式變更、翻譯建立。可依事件篩選、匯出 CSV，並在確認後清除。
 
+## 診斷（Refine Lab → 工具 → 診斷）
+
+- **排程事件（cron）：**列出每個事件與下次執行時間；*立即執行*會執行一次（仍保留排程），*刪除*會移除非核心事件（核心 `wp_*` 事件受保護）。延遲超過 10 分鐘的事件會被標示，並提示改用真正的伺服器 cron。記錄為 `cron_run`／`cron_deleted`。
+- **偵錯記錄：**`debug.log` 的最後 200 行（可依文字篩選、下載、清空）。僅在 `WP_DEBUG_LOG` 啟用且檔案位於 wp-content 或 WordPress 資料夾內時可用。
+- **郵件記錄**（預設關閉，選項 `refinelab_maillog_settings`）：在 `refinelab_maillog` 記住最近 100 封郵件（時間、收件者、主旨、結果、錯誤）。絕不儲存郵件內文，因此沒有重新寄送功能。
+
+## 搜尋與取代（Refine Lab → 工具 → 搜尋與取代）
+
+在本網站每個具單一欄位主鍵的資料表中取代文字（略過 `guid` 欄位），包含序列化資料內部（會修正長度，不會反序列化）。勾選*網站位址*時，也會比對 http/https、無通訊協定與 JSON 跳脫的形式，並在主機名稱結尾處停止。請務必先執行**試跑**（不勾選*套用*）：它只統計各資料表符合的列數而不寫入。每次執行約 20 秒後會停止並提供**繼續**。套用前請先備份；記錄為 `db_replaced`。
+
+## 管理列
+
+管理員會看到 **Refine Lab** 選單：清除區塊快取、開啟或關閉維護模式（開啟時顯示圓點）、前往備份與還原和診斷。
+
+## WP-CLI## WP-CLI
+
+| 指令 | 功能 |
+| :--- | :--- |
+| `wp refinelab status` | 版本、已啟用的模組、備份、排程、完整性。 |
+| `wp refinelab backup-create [--components=database,uploads,plugins,themes] [--note=…]` | 在單一程序中進行整站備份。 |
+| `wp refinelab backup-list [--format=json]`、`backup-delete <id>` | 列出／刪除備份。 |
+| `wp refinelab integrity-scan` | 掃描核心、外掛與佈景主題檔案。 |
+| `wp refinelab cache-clear` | 清除 HTML 區塊快取。 |
+| `wp refinelab db-clean [--kinds=transients,spam] [--dry-run]` | 資料庫清理（重複執行直到清空）。 |
+| `wp refinelab autoload [--limit=20]` | 最大的自動載入選項。 |
+| `wp refinelab blocks-lint` | 範本警告與各 HTML 區塊的使用位置（有警告時結束碼為 1）。 |
+
 ## 區塊歷史（編輯器）
+
+佈景主題區塊的編輯器捷徑：**可見性**面板可在手機（600px 以下）、平板（600–959px）或桌機（960px 以上）隱藏區塊，使用 class `refinelab-hide-mobile|tablet|desktop`（屬性 `refinelabHide`）；區塊選項選單有**複製區塊設定**／**貼上區塊設定**（限同一區塊類型）；**顯示區塊外框**（更多選單或指令面板）會標出區塊與綁定欄位。指令面板（Ctrl/Cmd+K）也可清除區塊快取、前往備份與診斷。
+
+文件側邊欄另有 **無障礙檢查** 面板：掃描畫布中缺少替代文字的圖片、沒有名稱的連結、跳級或重複的標題層級與空標題；點選項目即可選取該區塊（手動重新檢查，不會在背景掃描）。
 
 每次儲存文章時，每個 `theme/*` 區塊的屬性都會快照到文章中繼資料 `_refinelab_block_history`（每篇文章最多 20 份快照／400 KB）。在區塊側邊欄，**區塊歷史**會列出所選區塊先前的狀態；*還原*會將區塊回復，且該變更可像一般編輯一樣復原。REST 路由見 [hooks-and-api.md](hooks-and-api.md)。
 

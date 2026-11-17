@@ -36,6 +36,22 @@ An e-mail (through `wp_mail()`, so the Mailer applies) to `alert_email` (default
 | `alert_admin_change` | A user is created as, or given the role of, administrator. |
 | `alert_plugin_change` | A plugin is activated, deactivated or deleted, or the theme is switched. |
 
+## Passwords and sessions
+
+| Key | Values | Behaviour |
+| :--- | :--- | :--- |
+| `password_min_length` | `0` (WordPress default), 8, 10, 12, 14, 16 | Minimum length of a new password. |
+| `password_require_mix` | on / off | At least three of lowercase, capitals, digits, symbols. |
+| `password_hibp` | on / off | Refuses passwords found in the Pwned Passwords list. Only the first 5 characters of the SHA-1 hash are sent (k-anonymity), never the password; if the service cannot be reached the password is accepted. |
+| `idle_logout_minutes` | `0` (never), 15, 30, 60, 120, 240, 480 | Signs out users who can edit content after this long without a page request (Heartbeat does not count). Tracked in user meta `_refinelab_last_seen`, written at most once a minute. |
+| `max_sessions` | `0` (no limit), 1, 2, 3, 5 | At sign-in the oldest sessions beyond the limit are ended. |
+
+The password rules apply when a password is set in a profile, on the new-user screen and on password reset; existing passwords are not touched. **Sign me out of all my other sessions** is on the same card.
+
+## Content Security Policy
+
+`csp_mode`: `off`, `report_only` (header `Content-Security-Policy-Report-Only`, nothing is blocked) or `enforce`. `csp_preset`: `relaxed` (inline scripts and HTTPS sources allowed), `strict` (same-site only, no inline scripts) or `custom` (`csp_custom`, plain directives separated by semicolons). Sent on front-end requests only. Browsers report violations to `POST /wp-json/refinelab/v1/csp-report` (public by nature: throttled to 120 reports an hour, query strings dropped, at most 50 distinct directive/address pairs kept in `refinelab_csp_reports`); the list is on the Security page. Start with report only, fix the policy until the list stays empty, then enforce.
+
 ## Login protection
 
 | Key | Default | Behaviour |
@@ -67,6 +83,10 @@ Class `RefineLab_Two_Factor` (`includes/modules/security/class-two-factor.php`),
 - Storage: user meta `_refinelab_2fa_{enabled,secret,pending,recovery,last_step}`. The secret is encrypted with libsodium using a key derived from the `AUTH` salt; **changing the salts invalidates enrolled secrets** (users must use recovery codes or be reset). Recovery codes are stored as HMAC hashes.
 - The prompt is a field on the login form, not a second screen, so a wrong or missing code reveals that the password was correct. Application passwords and REST cookie auth do not go through the login form and are not affected (disable application passwords separately if needed).
 - **Recovery**: define `REFINELAB_DISABLE_2FA` as `true` in `wp-config.php` to skip all 2FA checks and hide the UI.
+
+### Requiring two-factor by role
+
+`twofactor_required_roles` (roles), `twofactor_grace_days` (0, 3, 7, 14, 30) and `twofactor_required_since` (set when roles are first chosen). Users with those roles who have not set up two-factor see a reminder until the grace period ends; after that every admin screen except their profile, `admin-post.php` and `admin-ajax.php` redirects to the profile until it is set up. Needs `two_factor_enabled`. `REFINELAB_DISABLE_2FA` in wp-config.php switches enforcement off if everyone is ever locked out. E-mail one-time codes are not available.
 
 ### Custom login URL
 

@@ -109,6 +109,31 @@ In text and attribute values: `{{ key }}`, `{{ site.url }}`, `{{ context.title }
 </section>
 ```
 
+### Filters
+
+Add filters after a pipe: `{{ title | upper }}`, `{{ text | truncate:80 }}`, `{{ price | default:'—' }}`, `{{ date | date:'d/m/Y' }}`, chained `{{ name | trim | capitalize }}`.
+
+| Filter | Effect |
+| :--- | :--- |
+| `upper`, `lower`, `capitalize`, `trim` | Text case / whitespace. |
+| `truncate:N` | First N characters plus `…`. |
+| `default:'x'` | Used when the value is missing or empty. |
+| `date:'fmt'` | Formats a date or timestamp (PHP date format; the editor preview uses the browser's date style). |
+| `length` | Characters of text or items of a list. |
+| `json` | JSON text of a value (lists, objects). |
+
+Output is always escaped. Filters work in the editor preview and on the front end.
+
+### Per-field typography and spacing
+
+Add `data-typography` and/or `data-spacing` to a bound text, heading or link to give editors native-style controls for that one field:
+
+```html
+<h2 data-bind="title" data-typography="size, weight, line-height, letter-spacing, transform" data-spacing="margin, padding">Headline</h2>
+```
+
+Select the element in the editor and the sidebar shows **Typography** and **Spacing** panels. Choices are stored in `<key>_style` (so a key ending in `_style` is reserved) and rendered as inline styles through the WordPress style engine; presets such as `var:preset|spacing|40` resolve like core blocks. Only known properties and safe values (numbers with px/rem/em/%/vw/vh/ch, preset references, CSS variables, `clamp()`/`min()`/`max()`/`calc()`) are accepted. Elements without these attributes are unchanged.
+
 ## 6. Conditions and loops
 
 | Directive | Purpose |
@@ -122,7 +147,13 @@ In text and attribute values: `{{ key }}`, `{{ site.url }}`, `{{ context.title }
 
 Expressions: truthiness, `!x`, dot paths, `==`, `!=`, `===`, `!==` (compared as text), `<`, `>`, `<=`, `>=` (numeric when both sides are numbers), `a in 'x,y,z'` (comma list or an array), `&&`, `||` and parentheses: `data-if="count > 3 && (lang == 'vi' || lang == 'en')"`. Precedence: `||`, then `&&`, then comparison, then `!`. Loop scope: `index`, `is_first`, `is_last` (or your aliases, e.g. `crumb.is_last`). Use `<template data-for>` as a transparent wrapper.
 
-## 7. Declarative components
+### Partials, variations and the template check
+
+- **Partials:** `<include src="button" />` is replaced by `blocks/_partials/button.html` (looked up next to the template, then one folder up; letters, digits, `-`, `_`, `/` only; nested up to 3 levels). Edit the partial once, every block that includes it follows.
+- **Variations:** `<template data-variation="dark" data-title="Dark">{"title":"Dark hero"}</template>` adds an inserter variation of the block with those attribute values. The JSON must be valid; the template is removed from the output.
+- **Template check:** **Blocks → Template check and usage** lists, per block, typos in directives (for example `data-suports`), missing partials, invalid variations, duplicate inspector keys and `data-for-empty` without a loop, and the pages that use the block. `wp refinelab blocks-lint` prints the same.
+
+## 7. Declarative components## 7. Declarative components
 
 | Attribute | Behaviour |
 | :--- | :--- |
@@ -139,6 +170,10 @@ Expressions: truthiness, `!x`, dot paths, `==`, `!=`, `===`, `!==` (compared as 
     <textarea-control data-bind="k" rows="3"></textarea-control>
     <toggle-control data-bind="k" default="true"></toggle-control>
     <range-control data-bind="k" min="0" max="100" default="40"></range-control>
+    <number-control data-bind="k" min="0" max="50" step="1" default="3"></number-control>
+    <radio-control data-bind="k" default="m"><option value="s">Small</option><option value="m">Medium</option></radio-control>
+    <date-control data-bind="k" default="2026-11-17"></date-control>
+    <image-control data-bind="k"></image-control> <!-- URL in "k", attachment id in "k_id" -->
     <select-control data-bind="k" default="3"><select-control-option value="3">3</select-control-option></select-control>
     <color-picker data-bind="k" default="#fff"></color-picker>
     <link-control data-bind="k"></link-control>
@@ -163,7 +198,10 @@ Available in every template (`refinelab_html_blocks_global_attributes` filters t
 | :--- | :--- |
 | `site` | `name`, `description`, `url`, `admin_url`, `language`, `charset`, `theme` |
 | `context` | `title`, `slug`, `url`, `type`, `post_type`, `id`, `is_front_page`, `is_home`, `is_single`, `is_page`, `is_archive`, `is_category`, `is_tag`, `is_tax`, `is_search`, `is_404`, `paged` |
-| `post` | `id`, `title`, `slug`, `type`, `url`, `excerpt`, `date`, `thumbnail`, `author` |
+| `post` | `id`, `title`, `slug`, `type`, `url`, `excerpt`, `date`, `thumbnail`, `author`, `meta` (public custom fields of the post, scalar values, at most 100), `terms` (name, slug, taxonomy, url) |
+| `menu` | `menu.<location>`: the menu assigned to a theme location as a tree of `title`, `url`, `target`, `is_current`, `children` |
+| `query` | URL parameters allowed by the filter `refinelab_html_blocks_query_params` (default `s`, `paged`, `lang`, `cat`, `tag`, `orderby`), plain text, max 100 characters |
+| `options` | Only the options named by the filter `refinelab_html_blocks_option_keys` (default none), scalar values |
 | `posts` | recent/queried post objects |
 | `term`, `terms` | queried term; category list |
 | `languages` | list of `code`, `name`, `flag`, `url`, `is_current`, `label` |

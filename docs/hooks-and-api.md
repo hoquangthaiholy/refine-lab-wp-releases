@@ -9,6 +9,8 @@ Everything a developer can call or extend, with an example and the context to us
 | Filter | Arguments | Default / return | When it runs |
 | :--- | :--- | :--- | :--- |
 | `refinelab_html_blocks_directories` | `string[] $dirs` | `<theme>/blocks`, `<theme>/template-parts/blocks`, `<theme>/html-blocks` (and the parent theme's) | Scanning for block templates. |
+| `refinelab_html_blocks_query_params` | `string[] $params` | `s`, `paged`, `lang`, `cat`, `tag`, `orderby` | URL parameters exposed as `{{ query.<param> }}` (text only, max 100 characters). |
+| `refinelab_html_blocks_option_keys` | `string[] $names` | none | Option names exposed as `{{ options.<name> }}` (scalar values only). |
 | `refinelab_html_blocks_category_slug` | `string $slug, string $theme` | `theme` | Inserter category of blocks without `data-category`. |
 | `refinelab_html_blocks_category_title` | `string $title, string $theme` | Theme name | Same, the label. |
 | `refinelab_html_blocks_global_attributes` | `array $globals` | See [html-blocks.md §9](html-blocks.md) | Building the template context objects (`site`, `context`, `post`, …). |

@@ -9,6 +9,8 @@
 | 篩選器 | 參數 | 預設／回傳 | 執行時機 |
 | :--- | :--- | :--- | :--- |
 | `refinelab_html_blocks_directories` | `string[] $dirs` | `<theme>/blocks`、`<theme>/template-parts/blocks`、`<theme>/html-blocks`（及父佈景主題的） | 掃描區塊範本時。 |
+| `refinelab_html_blocks_query_params` | `string[] $params` | `s`、`paged`、`lang`、`cat`、`tag`、`orderby` | 以 `{{ query.<參數> }}` 提供的網址參數（僅文字，最多 100 字元）。 |
+| `refinelab_html_blocks_option_keys` | `string[] $names` | 無 | 以 `{{ options.<名稱> }}` 提供的選項名稱（僅限純量值）。 |
 | `refinelab_html_blocks_category_slug` | `string $slug, string $theme` | `theme` | 沒有 `data-category` 的區塊所屬的插入器分類。 |
 | `refinelab_html_blocks_category_title` | `string $title, string $theme` | 佈景主題名稱 | 同上，標籤部分。 |
 | `refinelab_html_blocks_global_attributes` | `array $globals` | 見 [html-blocks.md §9](html-blocks.md) | 建立範本情境物件（`site`、`context`、`post`、…）時。 |
