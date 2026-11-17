@@ -1,5 +1,7 @@
 # Backup and restore
 
+**Language:** English · [繁體中文](zh-TW/backup-restore.md)
+
 One page, **Refine Lab → Tools → Backup & restore**, covers three needs: quick settings snapshots, whole-site backups that can be restored on another domain, and portable settings files.
 
 | You want to… | Use | Contains | Where it is stored |

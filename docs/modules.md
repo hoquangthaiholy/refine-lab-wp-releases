@@ -1,5 +1,7 @@
 # Modules reference
 
+**Language:** English · [繁體中文](zh-TW/modules.md)
+
 All modules extend `RefineLab_Abstract_Module` (`get_slug()`, `get_title()`, settings helpers, `render_admin_tab()` → `views/tab.php`). They are created by `RefineLab_Plugin` (`load_core_modules()`, lazy `get_module()`), and are reachable through `refinelab_tools()-><slug>`. Module on/off flags live in the option `refinelab_tools_settings` as `enable_<slug>`; module settings in `refinelab_<slug>_settings`.
 
 Admin pages (Refine Lab menu): HTML Blocks, Enhancements, Media Tools, Mailer, Forms, Languages, SEO, Security, Custom Types, System Status, Library.

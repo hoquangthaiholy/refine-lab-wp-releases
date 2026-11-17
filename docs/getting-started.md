@@ -1,5 +1,7 @@
 # Getting started
 
+**Language:** English · [繁體中文](zh-TW/getting-started.md)
+
 Refine Lab is a modular WordPress toolkit: native Gutenberg blocks from plain HTML templates, forms, multilingual content, SEO, security, mail delivery, backups and everyday utilities. Switch on only what you need; every module can be turned off.
 
 ## Requirements

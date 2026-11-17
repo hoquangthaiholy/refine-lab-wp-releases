@@ -1,5 +1,7 @@
 # HTML Blocks — authoring reference
 
+**Language:** English · [繁體中文](zh-TW/html-blocks.md)
+
 The engine scans the active theme (and parent theme) for block templates and registers each as a Gutenberg block `theme/<slug>`.
 
 Scanned directories: `<theme>/blocks/`, `<theme>/template-parts/blocks/`, `<theme>/html-blocks/`. Extend with the filter `refinelab_html_blocks_directories`. A block is either `<slug>.html` or `<slug>/index.html` (multi-file, see §9). Block definitions are cached in the transient `refinelab_blocks_<md5(stylesheet)>`, invalidated by file mtime, theme switch and `save_post`.

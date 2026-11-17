@@ -1,5 +1,7 @@
 # Languages (multilingual content)
 
+**Language:** English · [繁體中文](zh-TW/multilang.md)
+
 Run one WordPress site in several languages with language URLs, translated posts and terms, a language switcher, per-language header/footer template parts and a dashboard that shows what is translated, outdated or missing.
 
 Admin: **Refine Lab → Languages** (Settings tab and **Translations** tab). Module class `RefineLab_MultiLang`; options `refinelab_multilang_settings` (configuration) and `refinelab_multilang_strings` (string translations).

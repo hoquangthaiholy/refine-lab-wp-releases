@@ -1,5 +1,7 @@
 # Security module reference
 
+**Language:** English · [繁體中文](zh-TW/security.md)
+
 Class `RefineLab_Security` · option `refinelab_security_settings` · admin page **Refine Lab → Security** · file `includes/modules/security/class-security.php`.
 
 ## Admin page layout

@@ -1,5 +1,7 @@
 # Hooks, functions and endpoints
 
+**Language:** English · [繁體中文](zh-TW/hooks-and-api.md)
+
 Everything a developer can call or extend, with an example and the context to use it in. Only items that exist in the code are listed. Prefixes: `refinelab_` (options, hooks, actions), `RefineLab_` (classes), `.refinelab-*` (CSS), `REFINELAB_WP_*` (constants).
 
 ## 1. PHP filters

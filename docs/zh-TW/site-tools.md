@@ -1,0 +1,133 @@
+# 網站工具
+
+[English](../site-tools.md)
+
+營運類模組的參考。下列每個選項都顯示在其後台頁面；鍵名就是你在儲存的選項、匯出與 WP-CLI 中看到的名稱。安全性強化另有獨立指南：[security.md](security.md)。備份：[backup-restore.md](backup-restore.md)。表單：[forms.md](forms.md)。語言：[multilang.md](multilang.md)。
+
+## 效能（Refine Lab → 效能 → 速度）
+
+小巧、可復原的前台最佳化。一切**預設為關閉**，且在後台、登入畫面、feed、customizer 預覽，或開啟 `SCRIPT_DEBUG` 時完全不會執行。選項 `refinelab_performance_settings`。
+
+| 鍵 | 效果 | 範例 |
+| :--- | :--- | :--- |
+| `defer_scripts` + `defer_handles` | 為列出的指令碼 handle 加上 `defer`（也會套用到本外掛自己的前台指令碼）。`defer_handles` 接受以空白、逗號或換行分隔的 WordPress 指令碼 handle（最多 30 個）。 | `jquery-migrate`、`my-theme-slider` |
+| `decoding_async` | 為內容圖片加上 `decoding="async"`。 | — |
+| `remove_emoji` | 移除表情符號偵測指令碼與樣式。 | — |
+| `remove_embeds` | 移除 `wp-embed` 指令碼與 oEmbed 探索。 | — |
+| `preload_fonts` | 每行一個網址；每個都會在 head 開頭成為 `<link rel="preload" href="…" as="font" type="font/woff2" crossorigin>`（type 依 `woff2`、`woff`、`ttf`、`otf` 選擇）。請使用你自己網站的檔案。 | `https://example.com/fonts/inter.woff2` |
+
+指令碼 handle 可在頁面原始碼找到（`id="…-js"`，去掉 `-js`）。關閉選項即可回到原本的行為。
+
+## 媒體（Refine Lab → 效能 → 媒體）
+
+圖片工具，選項 `refinelab_media_settings`。
+
+| 鍵 | 預設 | 意義 |
+| :--- | :--- | :--- |
+| `webp_enabled`、`avif_enabled` | 關 | 為 JPEG 與 PNG 上傳檔建立 WebP／AVIF 副本（只有伺服器支援該格式時才提供）。 |
+| `quality` | 82 | 副本的壓縮品質。 |
+| `max_dimension` | 0（關） | 寬或高的上限；更大的上傳檔會被縮小。 |
+
+副本與每個檔案及尺寸放在一起（`photo-300x200.jpg` → `photo-300x200.jpg.webp`），且**只有比原檔小時才保留**。附件中繼資料 `_refinelab_modern_images` 記錄哪些檔案有副本；`wp_content_img_tag` 上的篩選器會透過 `<picture>` 提供它們，不支援的瀏覽器仍使用原本的 `<img>`。批次工具可轉換現有媒體庫（`wp_ajax_refinelab_modern_batch`）。
+
+**SVG 上傳**（**編輯器／媒體**，旗標 `enable_svg_upload`）：經過嚴格的清理器後，允許媒體庫使用 `.svg`：檔案以 `DOMDocument` 解析（無 DTD、無網路），只保留允許清單中的元素與屬性，指令碼、事件處理程式、外部參照與不安全的 CSS 會被移除，儲存的檔案是清理後的標記。`.svgz` 不被接受。
+
+## 轉址與 404 記錄（Refine Lab → SEO → 轉址、404 記錄）
+
+規則會在 `template_redirect` 早期比對。資料表 `{prefix}refinelab_redirects` 與 `{prefix}refinelab_404`（自動建立；最多 1000 條規則）。
+
+| 欄位 | 值 |
+| :--- | :--- |
+| `source` | 請求路徑，例如 `/old-page/`。 |
+| `target` | 目的網址或路徑。410 不使用。 |
+| `type` | `301` 永久、`302` 暫時、`410` 已移除。 |
+| `match` | `exact`；`wildcard`，其中 `*` 擷取其餘部分（`/old/*` → `/new/$1`）；`regex`（PCRE 模式，反向參照 `$1`…）。 |
+
+儲存規則時會拒絕迴圈與轉址鏈。**404 記錄：** 前台的 404 請求會被計數（略過機器人與探測路徑，每次請求只有一次輕量寫入，且有上限），每一列都有一鍵*建立轉址*。
+
+**CSV 格式**（匯入最多 500 列／500 KB，匯出全部規則）：標題列 `source,target,type,match`。
+
+```csv
+source,target,type,match
+/old-shop/,/shop/,301,exact
+/blog/2019/*,/archive/$1,301,wildcard
+/promo,,410,exact
+```
+
+無效的列會被略過；匯出時以 `=`、`+`、`-` 或 `@` 開頭的儲存格會被中和。
+
+## 指令碼（Refine Lab → 工具 → 指令碼）
+
+在五個位置輸出你自己的程式碼（分析、像素、行內 CSS 或 JS）。選項 `refinelab_scripts_settings`；每個位置最多 100 KB。
+
+| 位置鍵 | 輸出於 |
+| :--- | :--- |
+| `front_head` | 前台，`</head>` 之前（`wp_head`）。 |
+| `front_body` | 前台，緊接 `<body>` 之後（`wp_body_open`；佈景主題必須呼叫它）。 |
+| `front_footer` | 前台，`</body>` 之前（`wp_footer`）。 |
+| `admin_head`、`admin_footer` | 後台頁首／頁尾。 |
+
+`skip_editors` 會讓有權編輯文章的已登入使用者**不**輸出前台程式碼（避免自己的造訪被納入分析）。程式碼會**原樣**輸出，所以請自行包含 `<script>` 或 `<style>` 標籤，且只有具備 `unfiltered_html` 的使用者才能變更。此選項刻意排除在備份與匯出之外。若某段程式碼讓頁面壞掉，請在 `wp-config.php` 加入 `define( 'REFINELAB_WP_DISABLE_SCRIPTS', true );`，再到後台修正。
+
+```html
+<!-- front_head -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXX"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-XXXX');</script>
+```
+
+## 維護模式（Refine Lab → 工具 → 維護）
+
+選項 `refinelab_maintenance_settings`。
+
+| 鍵 | 意義 |
+| :--- | :--- |
+| `enabled` | 開啟此模式。開啟期間工具列會顯示徽章。 |
+| `page_id` | 要顯示的已發佈頁面（會套用你佈景主題的區塊與樣式）；留空則使用 `title` 與 `message`。 |
+| `title`、`message` | 內建訊息。 |
+| `retry_after` | 分鐘（5–1440，預設 60），送在 `Retry-After` 標頭中。 |
+| `token` | 預覽連結 `https://example.com/?refinelab_preview=<token>` 的密鑰；造訪它會設定 12 小時的 cookie（`refinelab_maint_bypass`）以略過此模式。*產生新連結*會使舊連結失效。 |
+
+訪客會得到 **HTTP 503**，附帶 `Retry-After` 與 `noindex`，因此搜尋引擎會保留你的排名。不受影響：有權編輯頁面的已登入使用者、登入畫面、後台、AJAX、WP-Cron 與 REST API。
+
+## 檔案完整性（Refine Lab → 安全性 → 檔案完整性）
+
+回報被修改、遺失與新增的檔案；它**絕不**編輯或刪除任何東西。每個範圍最多 4000 個檔案。
+
+| 範圍 | 比對對象 |
+| :--- | :--- |
+| WordPress 核心 | api.wordpress.org 的官方校驗碼（網站健康狀態使用的同一份）。 |
+| 本外掛 | 外掛內附的 `hashes.json`（在建置版本時產生），否則使用在本站取得的基準。 |
+| 使用中的佈景主題 | 你在本站取得的基準（對檔案滿意時按*設定基準*）。 |
+
+設定（`refinelab_integrity_settings`）：`weekly`（透過 cron 掛鉤 `refinelab_integrity_scan` 排程掃描）與 `email`（有變動時寄信給管理員）。最近一次的報告保存在 `refinelab_integrity_report`，基準保存在 `refinelab_integrity_baseline`。報告可下載為 CSV。
+
+## 活動記錄（Refine Lab → 安全性 → 活動記錄）
+
+誰做了什麼，存放在資料表 `{prefix}refinelab_activity`。設定（`refinelab_activity_settings`）：`enabled`（預設開）、`retention_days`（預設 90，由 cron `refinelab_activity_prune` 每日清理）、`store_ip`（預設關）。設定的值永遠不會被記錄，只記錄哪個選項變更了。
+
+事件：登入、登入失敗、雙重驗證鎖定、外掛啟用／停用、切換佈景主題、設定變更、內容發佈、備份建立／還原、完整備份建立／下載／上傳／還原、設定匯出／匯入、完整性掃描、完整性基準設定、維護模式變更、翻譯建立。可依事件篩選、匯出 CSV，並在確認後清除。
+
+## 區塊歷史（編輯器）
+
+每次儲存文章時，每個 `theme/*` 區塊的屬性都會快照到文章中繼資料 `_refinelab_block_history`（每篇文章最多 20 份快照／400 KB）。在區塊側邊欄，**區塊歷史**會列出所選區塊先前的狀態；*還原*會將區塊回復，且該變更可像一般編輯一樣復原。REST 路由見 [hooks-and-api.md](hooks-and-api.md)。
+
+## 編輯器增強（Refine Lab → 編輯器）
+
+| `refinelab_tools_settings` 中的旗標 | 預設 | 效果 |
+| :--- | :--- | :--- |
+| `enable_sticky_post_title` | 開 | 捲動編輯器時，讓文章標題固定（模糊背景）。 |
+| `enable_resizable_sidebar` | 開 | 拖曳編輯器側邊欄的左緣調整寬度；按兩下重設為 280 px；寬度存於 `localStorage['refinelab_sidebar_width']`。需要 HTML 區塊模組。 |
+
+## 更新（Refine Lab → 總覽 → 更新）
+
+版本發佈在公開儲存庫 `hoquangthaiholy/refine-lab-wp-releases`。外掛標頭將該儲存庫宣告為 `Update URI`，所以 WordPress 本身會在**外掛**頁面顯示更新通知、提供一鍵更新與每個外掛的*啟用自動更新*開關。總覽卡片另外提供*檢查更新*與*自動安裝新版本*（WordPress 本身的自動更新清單）。
+
+- 外掛從儲存庫 `main` 分支讀取 `update.json`（快取 12 小時；失敗後 1 小時），並從 `sections.changelog` 顯示*新功能*。
+- ZIP 必須是該儲存庫的資產，且其 **SHA-256** 必須與資訊清單相符；下載內容會在 WordPress 解壓縮之前驗證，否則什麼都不會安裝。
+- 不會儲存或傳送任何權杖。只有在測試環境才需要覆寫位址：常數 `REFINELAB_WP_UPDATE_URL` 或篩選器 `refinelab_update_manifest_url`。
+
+資訊清單欄位：`version`、`package`、`sha256`、`requires`、`requires_php`、`tested`、`released`、`homepage`、`sections.changelog`。
+
+## 系統狀態（Refine Lab → 工具 → 系統狀態）
+
+供支援使用的環境詳細資訊（WordPress、佈景主題、PHP、伺服器、限制、擴充功能、哪些 Refine Lab 模組已開啟、區塊與自訂類型的數量）。*複製支援報告*會把純文字版放到剪貼簿。回報錯誤時請附上。

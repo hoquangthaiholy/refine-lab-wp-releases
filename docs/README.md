@@ -2,6 +2,8 @@
 
 Reference for site builders, theme authors and plugin developers. Everything here is checked against the code of the release it ships with.
 
+**Language:** English · [繁體中文](zh-TW/README.md)
+
 ## Start here
 
 | Document | For | Contents |

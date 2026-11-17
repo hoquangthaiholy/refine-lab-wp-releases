@@ -1,5 +1,7 @@
 # Site tools
 
+**Language:** English · [繁體中文](zh-TW/site-tools.md)
+
 Reference for the operational modules. Every option below is shown on its admin page; the keys are what you see in stored options, exports and WP-CLI. Security hardening has its own guide: [security.md](security.md). Backups: [backup-restore.md](backup-restore.md). Forms: [forms.md](forms.md). Languages: [multilang.md](multilang.md).
 
 ## Performance (Refine Lab → Performance → Speed)

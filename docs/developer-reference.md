@@ -1,5 +1,7 @@
 # Developer reference
 
+**Language:** English · [繁體中文](zh-TW/developer-reference.md)
+
 ## Constants (`refine-lab-wp.php`)
 
 | Constant | Meaning |

@@ -1,5 +1,7 @@
 # HTML blocks cookbook
 
+**Language:** English · [繁體中文](zh-TW/html-blocks-cookbook.md)
+
 Working patterns, each one a complete template you can drop into `<theme>/blocks/<slug>.html`. The syntax is explained in [html-blocks.md](html-blocks.md); the files below also ship with the plugin in `templates/sample-blocks/` (Refine Lab → Blocks → install sample blocks).
 
 ## 1. Smallest useful block

@@ -1,5 +1,7 @@
 # Forms
 
+**Language:** English · [繁體中文](zh-TW/forms.md)
+
 Zero-setup form handling: write a normal HTML `<form>`, add `data-form`, and Refine Lab validates it, stores the submission as an **Entry**, e-mails a notification and can forward it to a webhook. No shortcode and no form builder are involved.
 
 Admin: **Refine Lab → Forms** (settings and statistics) and **Entries** (the list of submissions). Module class `RefineLab_Forms`, option `refinelab_forms_settings`, entries are the custom post type `refine_entry`.
