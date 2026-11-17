@@ -4,7 +4,7 @@ Public release channel for the **Refine Lab** WordPress plugin (`refine-lab-wp`)
 
 - **Install:** download `refine-lab-wp-<version>.zip` from the [Releases](../../releases) page and upload it under *Plugins → Add New → Upload Plugin*.
 - **Update:** installed copies check `update.json` on this repository and offer updates in *Plugins* and on the Refine Lab *Overview* page. Every package is verified against the SHA-256 in `update.json` before WordPress installs it.
-- **Documentation:** [docs/](docs/README.md): HTML block syntax with examples, forms, languages, backup and restore, site tools, hooks and API reference.
+- **Documentation:** [docs/](docs/README.md): HTML block syntax with examples, forms, languages, backup and restore, site tools, hooks and API reference. Also in Traditional Chinese: [繁體中文文件](docs/zh-TW/README.md).
 - **Website:** https://refine-lab.com/
 
 ## Manifest (`update.json`)
