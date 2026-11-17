@@ -1,11 +1,11 @@
 {
-  "version": "1.1.0",
-  "package": "https://github.com/hoquangthaiholy/refine-lab-wp-releases/releases/download/v1.1.0/refine-lab-wp-1.1.0.zip",
-  "sha256": "c678f333d816b5bdbe74380cfe1cf89619e553d3483a92366b94a8159a6ae971",
+  "version": "1.1.1",
+  "package": "https://github.com/hoquangthaiholy/refine-lab-wp-releases/releases/download/v1.1.1/refine-lab-wp-1.1.1.zip",
+  "sha256": "54b6e8810acabec26e759759125eaeac6b50f1dc092364be71ed4d549b5852f1",
   "requires": "7.0",
   "released": "2026-11-17",
   "homepage": "https://refine-lab.com/",
   "sections": {
-    "changelog": "<h4>1.1.0</h4><ul><li>New Overview page with status, health check and update card</li><li>Full-site backup and restore (database, uploads, plugins, themes) with notes about every backup</li><li>Restore on another domain with serialized-safe address replacement, using a standalone runner that keeps working while the database is replaced</li><li>Backup &amp; restore merged with settings backups and export/import, with formal option names</li><li>Updates from this repository with checksum verification and an auto-update switch</li><li>Drag-and-drop file upload component</li><li>Menu stays open on sub-tabs; Forms page without tab bar</li><li>Refreshed Traditional Chinese translation</li></ul>"
+    "changelog": "<h4>1.1.1</h4><ul><li>Documentation links open the published documentation, in Traditional Chinese for zh_TW and zh_HK users</li><li>New Documentation, Release notes and Get support links on the Overview page</li><li>Complete developer documentation (HTML blocks syntax and cookbook, forms, languages, backup and restore, site tools, hooks and API) in English and Traditional Chinese</li><li>Updated Traditional Chinese translation of the interface</li></ul>"
   }
 }
