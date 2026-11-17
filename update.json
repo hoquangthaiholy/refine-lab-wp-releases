@@ -1,11 +1,11 @@
 {
-  "version": "1.1.1",
-  "package": "https://github.com/hoquangthaiholy/refine-lab-wp-releases/releases/download/v1.1.1/refine-lab-wp-1.1.1.zip",
-  "sha256": "54b6e8810acabec26e759759125eaeac6b50f1dc092364be71ed4d549b5852f1",
+  "version": "1.3.0",
+  "package": "https://github.com/hoquangthaiholy/refine-lab-wp-releases/releases/download/v1.3.0/refine-lab-wp-1.3.0.zip",
+  "sha256": "202ec0614fda9f8acf3c4b217494a8ba9135441e4b100048415ed4625fadb5f8",
   "requires": "7.0",
   "released": "2026-11-17",
   "homepage": "https://refine-lab.com/",
   "sections": {
-    "changelog": "<h4>1.1.1</h4><ul><li>Documentation links open the published documentation, in Traditional Chinese for zh_TW and zh_HK users</li><li>New Documentation, Release notes and Get support links on the Overview page</li><li>Complete developer documentation (HTML blocks syntax and cookbook, forms, languages, backup and restore, site tools, hooks and API) in English and Traditional Chinese</li><li>Updated Traditional Chinese translation of the interface</li></ul>"
+    "changelog": "<h4>1.3.0</h4><ul><li>## 1.3.0</li><li>**New**</li><li>Scheduled full-site backups (daily / weekly / monthly) with retention and a failure e-mail.</li><li>Security: block PHP in the uploads folder (with a real \"Test now\" check), optional block on plugin/theme installs, and e-mail alerts for new-address admin sign-ins, lockouts, new admins and plugin/theme changes.</li><li>Site Health tests and a Debug Info section.</li><li>Performance: Heartbeat control, revision limit with cleanup, autosave interval.</li><li>HTML blocks: `&amp;&amp;`, `||`, parentheses, comparisons and `in` in conditions; `data-class`; `data-limit`, `data-offset`, `data-for-empty`; more `data-supports` panels.</li><li>Media: virtual folders in the native Media Library; Forms entries are split by language.</li><li>Docs in English and Traditional Chinese are updated.</li></ul>"
   }
 }
