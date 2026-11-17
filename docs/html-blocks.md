@@ -20,7 +20,7 @@ One root element per template. Optional metadata:
 | `data-parent` | slug or comma list | empty | Restricts insertion to children of those blocks. |
 | `data-align` | `full` `wide` `center` `left` `right` | `full` | Default alignment. |
 | `data-editing-mode` | `default` `contentOnly` `disabled` | `default` | Block editing mode; the attribute is removed from the front end. |
-| `data-supports` | `margin`, `padding`, `spacing` (both), comma list | none | Opt in to native Gutenberg block supports. |
+| `data-supports` | `margin`, `padding`, `spacing` (both), `blockGap`, `typography` (font size, line height), `color` (text, background, links), `border`, `shadow`, `minHeight`, `anchor`; comma list | none | Opt in to native Gutenberg block supports (panels in the block sidebar). They style the block wrapper; text inside inherits unless the template sets its own size. |
 
 ## 2. Bindings: `data-bind`, `data-bind-prop`
 
@@ -116,8 +116,11 @@ In text and attribute values: `{{ key }}`, `{{ site.url }}`, `{{ context.title }
 | `data-if="expr"` / `data-elseif="expr"` / `data-else` | Conditional rendering (server and editor). |
 | `data-for="item in list"` / `data-for="(item, i) in list"` | Loop over a context array or attribute. |
 | `data-fe-if`, `data-fe-elseif`, `data-fe-else`, `data-fe-for` | Same, evaluated on the front end only (editor shows the sample). |
+| `data-limit="3"` / `data-offset="1"` on a `data-for` element | Render at most N items / skip the first N (`is_last` follows the limited list). |
+| `<template data-for-empty>` right after the loop element | Rendered only when the loop produced no items. |
+| `data-class="is-active: show; is-dark: theme == 'dark'"` | Adds each class whose condition is true (pairs separated by `;`). |
 
-Expressions: truthiness, `!x`, dot paths, `==`, `!=`, `===`, `!==`. Loop scope: `index`, `is_first`, `is_last` (or your aliases, e.g. `crumb.is_last`). Use `<template data-for>` as a transparent wrapper.
+Expressions: truthiness, `!x`, dot paths, `==`, `!=`, `===`, `!==` (compared as text), `<`, `>`, `<=`, `>=` (numeric when both sides are numbers), `a in 'x,y,z'` (comma list or an array), `&&`, `||` and parentheses: `data-if="count > 3 && (lang == 'vi' || lang == 'en')"`. Precedence: `||`, then `&&`, then comparison, then `!`. Loop scope: `index`, `is_first`, `is_last` (or your aliases, e.g. `crumb.is_last`). Use `<template data-for>` as a transparent wrapper.
 
 ## 7. Declarative components
 

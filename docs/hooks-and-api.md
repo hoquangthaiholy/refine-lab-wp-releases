@@ -139,6 +139,8 @@ Browser storage: `localStorage['refinelab_sidebar_width']` (resizable editor sid
 
 **REST** (`current_user_can( 'edit_post', post_id )`): `GET /wp-json/refinelab/v1/block-history?post_id=<id>&path=<index path>&name=<block name>`, where `path` is the block's position as dot-separated indexes (`0`, `2.1.0`) and `name` its block name (`theme/hero`). It returns the saved snapshots of that block, newest first, as `[ { id, time, user, attrs } ]`. Up to 20 snapshots (400 KB) are kept per post and one is recorded on each save that changed something; the editor's *Block history* panel uses it to roll a block back.
 
+**Media folders REST** (`upload_files`; assigning also needs `edit_post` on each file): `GET /wp-json/refinelab/v1/media-folders` returns `{ folders: [ { id, name, parent, count } ], total, unassigned }`; `POST /media-folders` with `{ name, parent }` creates a folder (names up to 80 characters, nesting up to 5 levels, duplicates under the same parent give 409); `PATCH /media-folders/<id>` with `{ name, parent }` renames or moves it (a move into itself or a subfolder is refused); `DELETE /media-folders/<id>` deletes it (files become unassigned, subfolders move up); `POST /media-folders/assign` with `{ ids: [..up to 200], folder }` moves files (`folder` 0 = unassigned) and returns the new state plus `moved` / `denied`. The media queries accept `refinelab_folder` (a folder id, or `none`): in the media grid and modal as the `query[refinelab_folder]` property, in list mode as `upload.php?refinelab_folder=`. New uploads join the folder sent as `refinelab_folder` with the upload request.
+
 **Public AJAX**: only `wp_ajax_refinelab_form_submit` and `wp_ajax_nopriv_refinelab_form_submit` (form submission; nonce, honeypot, rate limit, optional reCAPTCHA). `wp_ajax_nopriv_refinelab_site_backup_step` accepts only requests that carry a valid per-job secret created by an administrator.
 
 **Admin-only** (nonce and capability checked): see `admin_post_refinelab_*` and `wp_ajax_refinelab_*` below.
@@ -155,6 +157,7 @@ Browser storage: `localStorage['refinelab_sidebar_width']` (resizable editor sid
 | Media | `admin_post_refinelab_media_settings`, `wp_ajax_refinelab_modern_batch` |
 | Performance, scripts, maintenance | `admin_post_refinelab_performance_settings`, `refinelab_scripts_settings`, `refinelab_maintenance_save|token` |
 | Security | `admin_post_refinelab_integrity_run|baseline|settings|export`, `refinelab_activity_export|settings|clear`; cron `refinelab_integrity_scan`, `refinelab_activity_prune` |
+| Media folders | `admin_post_refinelab_media_folders_settings`; REST routes above |
 | Backup | `admin_post_refinelab_backup_create|restore|delete|download`, `refinelab_export`, `refinelab_import_upload|apply`, `refinelab_site_backup_download|delete|upload`; `wp_ajax_refinelab_site_backup_step`; standalone `restore-runner.php` |
 | Updates | `admin_post_refinelab_check_updates`, `refinelab_toggle_auto_update` |
 
@@ -180,6 +183,7 @@ Read-only: `REFINELAB_WP_VERSION`, `REFINELAB_WP_FILE`, `REFINELAB_WP_PATH`, `RE
 | :--- | :--- |
 | Options | `refinelab_tools_settings`, `refinelab_security_settings`, `refinelab_mailer_settings`, `refinelab_forms_settings`, `refinelab_seo_settings`, `refinelab_multilang_settings`, `refinelab_multilang_strings`, `refinelab_performance_settings`, `refinelab_media_settings`, `refinelab_scripts_settings`, `refinelab_maintenance_settings`, `refinelab_activity_settings`, `refinelab_integrity_settings`, `refinelab_integrity_baseline`, `refinelab_integrity_report`, `refinelab_custom_post_types`, `refinelab_custom_taxonomies`, `refinelab_settings_backups`, `refinelab_site_backups`, `refinelab_forms_webhook_log`, `refinelab_redirects_db` |
 | Tables | `{prefix}refinelab_activity`, `{prefix}refinelab_redirects`, `{prefix}refinelab_404` |
+| Taxonomy | `refinelab_media_folder` (hierarchical, attachments only, no public UI): media folders |
 | Post types | `refine_entry` (form entries), `refinelab_content` (content blocks, hidden) |
 | Post meta | `_refinelab_lang`, `_refinelab_translation_group`, `_refinelab_seo_*`, `_refinelab_zone`, `_refinelab_block_history`, `_refinelab_modern_images`, `_refinelab_form_*`, `_refinelab_fields`, `_refinelab_attachments`, `_refinelab_webhook` |
 | User meta | `_refinelab_2fa_*` |

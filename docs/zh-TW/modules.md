@@ -36,6 +36,22 @@
 ## mailer
 `RefineLab_Mailer`（在 `phpmailer_init` 延遲載入）。選項 `refinelab_mailer_settings`：`enabled`、`smtp_host`、`smtp_port`、`smtp_secure`、`smtp_auth`、`smtp_user`、`smtp_pass`、`from_email`、`from_name`、`force_from`，加上 OAuth 2.0（Gmail／Microsoft 365）：`auth_method`、`oauth_client_id`、`oauth_client_secret`、`oauth_tenant`、`oauth_refresh_token`、`oauth_email`（透過 PHPMailer 的 XOAUTH2；程式碼在 `traits/trait-mailer-oauth.php`）。
 - 掛鉤：`phpmailer_init`、`wp_mail_from`、`wp_mail_from_name`。AJAX `refinelab_send_test_email` 從後台頁面寄出測試郵件。
+- **郵件送達率（DNS 記錄）。** 當網域在你的 DNS 主機發佈 SPF、DKIM 與 DMARC 記錄時，來自你網域的郵件更可靠地進入收件匣：
+
+  ```text
+  # SPF：根網域（@）上的 TXT 記錄。請使用你的服務供應商對應的 include。
+  Google Workspace: v=spf1 include:_spf.google.com ~all
+  Microsoft 365:    v=spf1 include:spf.protection.outlook.com ~all
+  SendGrid:         v=spf1 include:sendgrid.net ~all
+  Brevo:            v=spf1 include:spf.sendinblue.com ~all
+
+  # DMARC：_dmarc.yourdomain.com 上的 TXT 記錄
+  v=DMARC1; p=quarantine; rua=mailto:dmarc-reports@yourdomain.com; pct=100; sp=quarantine
+
+  # DKIM：從服務供應商的控制台複製 CNAME／TXT 記錄。
+  ```
+
+  每個網域只保留一筆 SPF 記錄（若使用多個供應商，請合併 `include:` 部分），並使用已驗證信箱或網域的寄件者位址。
 
 ## seo
 `RefineLab_SEO` + trait `RefineLab_SEO_Schema`（`includes/modules/seo/traits/trait-seo-schema.php`）。後台頁面**社群與 SEO**。選項 `refinelab_seo_settings`：

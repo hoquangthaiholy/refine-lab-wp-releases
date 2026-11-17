@@ -42,6 +42,22 @@ Admin pages (Refine Lab menu): HTML Blocks, Enhancements, Media Tools, Mailer, F
 ## mailer
 `RefineLab_Mailer` (lazy-loaded on `phpmailer_init`). Option `refinelab_mailer_settings`: `enabled`, `smtp_host`, `smtp_port`, `smtp_secure`, `smtp_auth`, `smtp_user`, `smtp_pass`, `from_email`, `from_name`, `force_from`, plus OAuth 2.0 (Gmail / Microsoft 365): `auth_method`, `oauth_client_id`, `oauth_client_secret`, `oauth_tenant`, `oauth_refresh_token`, `oauth_email` (XOAUTH2 via PHPMailer; code in `traits/trait-mailer-oauth.php`).
 - Hooks: `phpmailer_init`, `wp_mail_from`, `wp_mail_from_name`. AJAX `refinelab_send_test_email` sends a test message from the admin page.
+- **Deliverability (DNS records).** Mail from your domain lands in the inbox more reliably when the domain publishes SPF, DKIM and DMARC records at your DNS host:
+
+  ```text
+  # SPF: TXT record on the root domain (@). Use the include for your provider.
+  Google Workspace: v=spf1 include:_spf.google.com ~all
+  Microsoft 365:    v=spf1 include:spf.protection.outlook.com ~all
+  SendGrid:         v=spf1 include:sendgrid.net ~all
+  Brevo:            v=spf1 include:spf.sendinblue.com ~all
+
+  # DMARC: TXT record at _dmarc.yourdomain.com
+  v=DMARC1; p=quarantine; rua=mailto:dmarc-reports@yourdomain.com; pct=100; sp=quarantine
+
+  # DKIM: copy the CNAME/TXT record from your provider's control panel.
+  ```
+
+  Keep one SPF record per domain (merge the `include:` parts if you use several providers), and use the sender address of the authenticated mailbox or domain.
 
 ## seo
 `RefineLab_SEO` + trait `RefineLab_SEO_Schema` (`includes/modules/seo/traits/trait-seo-schema.php`). Admin page **Social & SEO**. Option `refinelab_seo_settings`:

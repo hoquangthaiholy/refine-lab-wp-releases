@@ -139,6 +139,8 @@ add_theme_support( 'refinelab-content', array(
 
 **REST**（`current_user_can( 'edit_post', post_id )`）：`GET /wp-json/refinelab/v1/block-history?post_id=<id>&path=<索引路徑>&name=<區塊名稱>`，其中 `path` 是區塊位置，以點號分隔的索引表示（`0`、`2.1.0`），`name` 是其區塊名稱（`theme/hero`）。它會依新到舊回傳該區塊儲存的快照，格式為 `[ { id, time, user, attrs } ]`。每篇文章最多保留 20 份快照（400 KB），每次有變動的儲存會記錄一份；編輯器的*區塊歷史*面板用它來回復區塊。
 
+**媒體資料夾 REST**（`upload_files`；歸類還需要對每個檔案具備 `edit_post`）：`GET /wp-json/refinelab/v1/media-folders` 回傳 `{ folders: [ { id, name, parent, count } ], total, unassigned }`；`POST /media-folders` 帶 `{ name, parent }` 建立資料夾（名稱最多 80 個字元、最多巢狀 5 層，同一父層下重複名稱回傳 409）；`PATCH /media-folders/<id>` 帶 `{ name, parent }` 重新命名或移動（移到自己或子資料夾會被拒絕）；`DELETE /media-folders/<id>` 刪除（檔案變成未歸類，子資料夾上移）；`POST /media-folders/assign` 帶 `{ ids: [..最多 200 個], folder }` 移動檔案（`folder` 為 0 表示未歸類），並回傳新狀態加上 `moved`／`denied`。媒體查詢接受 `refinelab_folder`（資料夾 id 或 `none`）：在媒體網格與對話框中為 `query[refinelab_folder]` 屬性，清單模式為 `upload.php?refinelab_folder=`。新上傳的檔案會加入隨上傳請求送出的 `refinelab_folder` 資料夾。
+
 **公開 AJAX**：只有 `wp_ajax_refinelab_form_submit` 與 `wp_ajax_nopriv_refinelab_form_submit`（表單提交；nonce、honeypot、頻率限制、可選的 reCAPTCHA）。`wp_ajax_nopriv_refinelab_site_backup_step` 只接受帶有管理員建立之有效工作密鑰的請求。
 
 **僅限後台**（檢查 nonce 與權限）：見下方的 `admin_post_refinelab_*` 與 `wp_ajax_refinelab_*`。
@@ -155,6 +157,7 @@ add_theme_support( 'refinelab-content', array(
 | 媒體 | `admin_post_refinelab_media_settings`、`wp_ajax_refinelab_modern_batch` |
 | 效能、指令碼、維護 | `admin_post_refinelab_performance_settings`、`refinelab_scripts_settings`、`refinelab_maintenance_save|token` |
 | 安全性 | `admin_post_refinelab_integrity_run|baseline|settings|export`、`refinelab_activity_export|settings|clear`；cron `refinelab_integrity_scan`、`refinelab_activity_prune` |
+| 媒體資料夾 | `admin_post_refinelab_media_folders_settings`；上述 REST 路由 |
 | 備份 | `admin_post_refinelab_backup_create|restore|delete|download`、`refinelab_export`、`refinelab_import_upload|apply`、`refinelab_site_backup_download|delete|upload`；`wp_ajax_refinelab_site_backup_step`；獨立的 `restore-runner.php` |
 | 更新 | `admin_post_refinelab_check_updates`、`refinelab_toggle_auto_update` |
 
@@ -180,6 +183,7 @@ add_theme_support( 'refinelab-content', array(
 | :--- | :--- |
 | 選項 | `refinelab_tools_settings`、`refinelab_security_settings`、`refinelab_mailer_settings`、`refinelab_forms_settings`、`refinelab_seo_settings`、`refinelab_multilang_settings`、`refinelab_multilang_strings`、`refinelab_performance_settings`、`refinelab_media_settings`、`refinelab_scripts_settings`、`refinelab_maintenance_settings`、`refinelab_activity_settings`、`refinelab_integrity_settings`、`refinelab_integrity_baseline`、`refinelab_integrity_report`、`refinelab_custom_post_types`、`refinelab_custom_taxonomies`、`refinelab_settings_backups`、`refinelab_site_backups`、`refinelab_forms_webhook_log`、`refinelab_redirects_db` |
 | 資料表 | `{prefix}refinelab_activity`、`{prefix}refinelab_redirects`、`{prefix}refinelab_404` |
+| 分類法 | `refinelab_media_folder`（階層式，僅用於附件，無公開介面）：媒體資料夾 |
 | 文章類型 | `refine_entry`（表單項目）、`refinelab_content`（內容區塊，隱藏） |
 | 文章中繼資料 | `_refinelab_lang`、`_refinelab_translation_group`、`_refinelab_seo_*`、`_refinelab_zone`、`_refinelab_block_history`、`_refinelab_modern_images`、`_refinelab_form_*`、`_refinelab_fields`、`_refinelab_attachments`、`_refinelab_webhook` |
 | 使用者中繼資料 | `_refinelab_2fa_*` |

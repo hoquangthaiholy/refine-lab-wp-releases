@@ -18,9 +18,23 @@ Small, reversible front-end optimisations. Everything is **off by default**, and
 
 Find script handles in the page source (`id="…-js"`, without the `-js`). Turn an option off to return to stock behaviour.
 
+### Server load (Refine Lab → Performance → Speed)
+
+Unlike the options above these also apply in the admin. Defaults keep WordPress behaviour.
+
+| Key | Values | Effect |
+| :--- | :--- | :--- |
+| `heartbeat_admin`, `heartbeat_editor`, `heartbeat_front` | `default`, `slow` (60 s), `off` | Heartbeat frequency per place. Off in the editor also stops post locking and the expired-login prompt. |
+| `revisions_limit` | `default`, `0`, `3`, `5`, `10`, `25`, `50` | `wp_revisions_to_keep`. **Delete old revisions** removes the oldest beyond the limit (up to 2000 per click; logged as `revisions_cleaned`). |
+| `autosave_interval` | `default`, `120`, `300`, `600` seconds | Block-editor autosave interval. |
+
+### Site Health
+
+Refine Lab adds four tests to **Tools → Site Health** (recent backup, mail delivery, file integrity, uploads protection) and a "Refine Lab" section to Debug Info (version, enabled modules, backups kept). They only read stored results.
+
 ## Media (Refine Lab → Performance → Media)
 
-Image tools, option `refinelab_media_settings`.
+The **Media** tab has four cards, each saved on its own with its own *Save changes* button: **Media folders** (see below), **Image optimisation**, **Existing images** (batch conversion) and **SVG uploads**. Image tools, option `refinelab_media_settings`.
 
 | Key | Default | Meaning |
 | :--- | :--- | :--- |
@@ -29,6 +43,18 @@ Image tools, option `refinelab_media_settings`.
 | `max_dimension` | 0 (off) | Largest width or height; bigger uploads are scaled down. |
 
 Copies sit next to each file and size (`photo-300x200.jpg` → `photo-300x200.jpg.webp`) and are kept **only when smaller** than the original. The attachment meta `_refinelab_modern_images` lists which files have copies; the filter on `wp_content_img_tag` serves them through `<picture>` so browsers without support keep the original `<img>`. A batch tool converts the existing library (`wp_ajax_refinelab_modern_batch`).
+
+### Media folders (Refine Lab → Performance → Media)
+
+Organise the native Media Library in nested folders. Folders are **virtual**: they are terms of the taxonomy `refinelab_media_folder`, files stay where they are on disk, so image addresses never change, backups and CDNs keep working, and deleting a folder never deletes files. Switch it on or off with *Enable media folders* (`folders_enabled` in `refinelab_media_settings`, default on); turning it off hides the interface and keeps your folders and assignments.
+
+| Where | What you get |
+| :--- | :--- |
+| **Media → Library** (grid and list) | A folder tree on the left: *All files*, *Unassigned* and your folders with counts. Click a folder to filter. Create, rename and delete folders with the buttons that appear when you hover a row (subfolders up to 5 levels). **Drag files onto a folder** to move them; if several files are selected, all of them move. In list mode a **Folder** column and the bulk actions *Move to folder: …* and *Remove from folder* are added. |
+| **Media picker in the editor** (Select image, featured image, any media dialog) | A **folder filter** next to the other filters, with the folders indented by level. |
+| **Uploading** | New files go to the folder selected in the tree (or in the picker's filter); with *All files* selected they stay unassigned. Uploads that bypass the media dialog (for example drag and drop straight onto the Image block) are unassigned. |
+
+Counts are per folder (files in subfolders are counted in their own folder). Deleting a folder moves its subfolders up one level and leaves its files unassigned. A file can be in one folder. Anyone who can upload files can use folders; moving a file also needs permission to edit it (authors can move only their own files). Folders are stored in the database, so a **full backup** carries them; the settings export carries only the on/off switch. Developers: REST routes and data in [hooks-and-api.md](hooks-and-api.md).
 
 **SVG upload** (**Enhancements / Media**, flag `enable_svg_upload`): allows `.svg` in the Media Library after a strict sanitiser: the file is parsed with `DOMDocument` (no DTD, no network), only allow-listed elements and attributes survive, scripts, event handlers, external references and unsafe CSS are removed, and the stored file is the cleaned markup. `.svgz` is refused.
 

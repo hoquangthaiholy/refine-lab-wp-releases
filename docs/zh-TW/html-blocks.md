@@ -20,7 +20,7 @@
 | `data-parent` | slug 或以逗號分隔的清單 | 空 | 限制只能插入在這些區塊的子層。 |
 | `data-align` | `full` `wide` `center` `left` `right` | `full` | 預設對齊。 |
 | `data-editing-mode` | `default` `contentOnly` `disabled` | `default` | 區塊編輯模式；此屬性會從前台移除。 |
-| `data-supports` | `margin`、`padding`、`spacing`（兩者皆啟用）、以逗號分隔的清單 | 無 | 選用原生 Gutenberg 區塊支援。 |
+| `data-supports` | `margin`、`padding`、`spacing`（兩者皆啟用）、`blockGap`、`typography`（字級、行高）、`color`（文字、背景、連結）、`border`、`shadow`、`minHeight`、`anchor`；以逗號分隔的清單 | 無 | 選用原生 Gutenberg 區塊支援（顯示於區塊側邊欄）。套用於區塊外層；內部文字會繼承，除非範本自行指定大小。 |
 
 ## 2. 綁定：`data-bind`、`data-bind-prop`
 
@@ -116,8 +116,11 @@
 | `data-if="expr"`／`data-elseif="expr"`／`data-else` | 條件渲染（伺服器與編輯器皆適用）。 |
 | `data-for="item in list"`／`data-for="(item, i) in list"` | 迭代情境陣列或屬性。 |
 | `data-fe-if`、`data-fe-elseif`、`data-fe-else`、`data-fe-for` | 相同功能，但只在前台（訪客瀏覽器）計算；編輯器顯示示範內容。 |
+| 在 `data-for` 元素上加 `data-limit="3"` / `data-offset="1"` | 最多顯示 N 筆 / 略過前 N 筆（`is_last` 以限制後的清單為準）。 |
+| 緊接在迴圈元素後的 `<template data-for-empty>` | 僅在迴圈沒有任何項目時顯示。 |
+| `data-class="is-active: show; is-dark: theme == 'dark'"` | 條件成立的項目會加上對應 class（以 `;` 分隔）。 |
 
-運算式：真假值、`!x`、點號路徑、`==`、`!=`、`===`、`!==`。迴圈範圍：`index`、`is_first`、`is_last`（或你自訂的別名，例如 `crumb.is_last`）。可用 `<template data-for>` 作為透明的外層包裝。
+運算式：真假值、`!x`、點號路徑、`==`、`!=`、`===`、`!==`（以文字比較）、`<`、`>`、`<=`、`>=`（兩側皆為數字時以數值比較）、`a in 'x,y,z'`（逗號清單或陣列）、`&&`、`||` 與括號：`data-if="count > 3 && (lang == 'vi' || lang == 'en')"`。優先順序：`||`、`&&`、比較、`!`。迴圈範圍：`index`、`is_first`、`is_last`（或你自訂的別名，例如 `crumb.is_last`）。可用 `<template data-for>` 作為透明的外層包裝。
 
 ## 7. 宣告式元件
 

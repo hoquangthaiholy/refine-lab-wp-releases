@@ -22,6 +22,19 @@
 | `restrict_rest_api` | 關 | 除了篩選器 `refinelab_security_rest_allowed_namespaces` 允許的命名空間（預設 `refinelab`、`oembed`）外，訪客存取每一條 REST 路由都會得到 HTTP 401。可能會讓公開表單或無頭（headless）外掛失效。 |
 | `disable_application_passwords` | 關 | `wp_is_application_passwords_available` 回傳 false。 |
 | `disallow_file_edit` | 開 | 定義 `DISALLOW_FILE_EDIT`（僅在尚未定義時）。 |
+| `block_uploads_php` | 關 | 在 `uploads/.htaccess` 寫入標記區塊，拒絕 `.php`、`.phtml`、`.phar` 等檔案；關閉時會移除。僅適用 Apache/LiteSpeed；nginx 請加入「伺服器層級隱藏」中的規則。**立即測試**會上傳一個用完即刪的探測檔、以 HTTP 請求並回報 PHP 是否會被執行（探測檔一律刪除）。 |
+| `disallow_file_mods` | 關 | `file_mod_allowed` 為 false：後台無法安裝、更新或刪除外掛與佈景主題（同 `DISALLOW_FILE_MODS`）。關閉前包含本外掛在內的更新皆不會執行。 |
+
+## 安全警示
+
+透過 `wp_mail()`（因此會套用郵件模組設定）寄信到 `alert_email`（預設為網站管理員信箱）。同一類警示每 5 分鐘最多一封。
+
+| 金鑰 | 寄出時機 |
+| :--- | :--- |
+| `alert_admin_login` | 管理員從未見過的位址登入。位址僅以加鹽雜湊存於使用者中繼資料 `_refinelab_known_ips`（最近 10 筆）；啟用後的第一次登入只會記錄。 |
+| `alert_lockout` | 登入限制器鎖定某個位址時（需啟用 `limit_login_attempts`）。 |
+| `alert_admin_change` | 新增管理員，或使用者被授予管理員角色。 |
+| `alert_plugin_change` | 外掛被啟用、停用、刪除，或切換佈景主題。 |
 
 ## 登入防護
 

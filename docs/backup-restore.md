@@ -45,6 +45,10 @@ files/themes/…           themes
 
 Requirements: the PHP `zip` extension and a single-site install (multisite is not supported). Delete a backup from the list; older ones are removed automatically beyond the limit of 5.
 
+### Scheduled backups
+
+**Backup → Scheduled backups** makes a full backup every day, week or month through WP-Cron (first run at 03:00 site time). Pick the parts to include and how many scheduled backups to keep (1–10; older scheduled ones are deleted, manual ones never are). A failed run e-mails the address you set (default: the admin e-mail) and is written to the activity log. Option `refinelab_backup_schedule`, cron hook `refinelab_scheduled_backup`. WP-Cron needs visits to fire; for exact timing call `wp-cron.php` from a server cron.
+
 ## 3. Restoring a full backup
 
 1. **Restore** next to a backup in the list, or upload a `.zip` made on another site under **Restore from a file** (limited by PHP's upload size; the page shows your limit).

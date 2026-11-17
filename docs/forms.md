@@ -86,6 +86,7 @@ When `webhook_url` is set, every saved entry is queued and POSTed as JSON a mome
   "form_label": "Contact form",
   "submitted_at": "2026-11-17T07:00:00+00:00",
   "site": "https://example.com",
+  "language": "zh-tw",
   "fields": { "name": "Ada", "email": "ada@example.com", "message": "Hi" },
   "attachments": [ { "name": "cv.pdf", "size": 52311, "type": "application/pdf" } ]
 }
@@ -129,7 +130,15 @@ add_filter( 'refinelab_security_client_ip', function ( $ip ) {
 
 ## 6. Entries
 
-- Custom post type `refine_entry` (menu **Entries**). Meta keys: `_refinelab_form_id`, `_refinelab_form_label`, `_refinelab_fields` (array), `_refinelab_sender_email`, `_refinelab_sender_name`, `_refinelab_ip`, `_refinelab_user_agent`, `_refinelab_attachments`, `_refinelab_webhook`.
+**Entries by language.** When the Languages module is on with two or more languages, each entry remembers the language of the page the form was sent from (the front-end script sends it; the server accepts only a configured language code and otherwise leaves the entry untagged). The language is stored in the post meta `_refinelab_lang`, the same key as for translated content. Entries saved earlier, or sent when only one language was configured, count as the **default language**, like untagged posts. You get:
+
+- a **Language** column and the *All Languages | English (n) | 繁體中文 (n)* links above the Entries list (they follow the admin language switch);
+- the language on the entry screen and as a `Language:` line in the notification e-mail;
+- a **Language** column (code) at the end of the CSV export, and an export limited to the language selected in the list;
+- a `language` field in the webhook payload (the code, or an empty string when entries are not split by language).
+
+
+- Custom post type `refine_entry` (menu **Entries**). Meta keys: `_refinelab_lang`, `_refinelab_form_id`, `_refinelab_form_label`, `_refinelab_fields` (array), `_refinelab_sender_email`, `_refinelab_sender_name`, `_refinelab_ip`, `_refinelab_user_agent`, `_refinelab_attachments`, `_refinelab_webhook`.
 - **Export CSV** from the Entries screen (`admin_post_refinelab_export_submissions_csv`): batched for large lists, and any cell starting with `=`, `+`, `-` or `@` is neutralised so spreadsheets cannot run it as a formula.
 - Entries from older versions (post type `refinelab_submission`) are migrated automatically once.
 

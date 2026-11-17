@@ -22,6 +22,19 @@ Every option is stored as `1`/`0` (numbers and strings noted). The master switch
 | `restrict_rest_api` | off | Guests get HTTP 401 on every REST route except namespaces from the filter `refinelab_security_rest_allowed_namespaces` (default `refinelab`, `oembed`). May break public form / headless plugins. |
 | `disable_application_passwords` | off | `wp_is_application_passwords_available` false. |
 | `disallow_file_edit` | on | Defines `DISALLOW_FILE_EDIT` (only if not already defined). |
+| `block_uploads_php` | off | Writes a marked block to `uploads/.htaccess` that denies `.php`, `.phtml`, `.phar` and similar files, and removes it when switched off. Apache/LiteSpeed only; on nginx add the rule from "Server-level hiding". **Test now** uploads a throw-away probe file, requests it over HTTP and reports whether PHP would run (the probe is always deleted). |
+| `disallow_file_mods` | off | `file_mod_allowed` false: no installs, updates or deletions of plugins and themes from the admin (like `DISALLOW_FILE_MODS`). Updates, including this plugin's, will not run until it is turned off. |
+
+## Security alerts
+
+An e-mail (through `wp_mail()`, so the Mailer applies) to `alert_email` (default: the site admin e-mail). Alerts of one kind are limited to one every 5 minutes.
+
+| Key | Sent when |
+| :--- | :--- |
+| `alert_admin_login` | An administrator signs in from an address not seen before. Addresses are stored only as salted hashes in the user meta `_refinelab_known_ips` (last 10); the first sign-in after turning this on is only recorded. |
+| `alert_lockout` | The login limiter locks an address out (needs `limit_login_attempts`). |
+| `alert_admin_change` | A user is created as, or given the role of, administrator. |
+| `alert_plugin_change` | A plugin is activated, deactivated or deleted, or the theme is switched. |
 
 ## Login protection
 

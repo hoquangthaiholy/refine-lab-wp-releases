@@ -86,6 +86,7 @@ document.addEventListener('refinelab:form:success', function (e) {
   "form_label": "Contact form",
   "submitted_at": "2026-11-17T07:00:00+00:00",
   "site": "https://example.com",
+  "language": "zh-tw",
   "fields": { "name": "Ada", "email": "ada@example.com", "message": "Hi" },
   "attachments": [ { "name": "cv.pdf", "size": 52311, "type": "application/pdf" } ]
 }
@@ -129,7 +130,15 @@ add_filter( 'refinelab_security_client_ip', function ( $ip ) {
 
 ## 6. 項目（Entries）
 
-- 自訂文章類型 `refine_entry`（選單**項目 Entries**）。中繼資料鍵：`_refinelab_form_id`、`_refinelab_form_label`、`_refinelab_fields`（陣列）、`_refinelab_sender_email`、`_refinelab_sender_name`、`_refinelab_ip`、`_refinelab_user_agent`、`_refinelab_attachments`、`_refinelab_webhook`。
+**依語言區分項目。** 當語言模組開啟且有兩種以上語言時，每個項目都會記住送出表單的頁面所使用的語言（前台指令碼會傳送語言；伺服器只接受已設定的語言代碼，否則不標記該項目）。語言儲存在文章中繼資料 `_refinelab_lang`，與翻譯內容使用相同的鍵。先前儲存的項目，或只設定一種語言時送出的項目，一律視為**預設語言**，與未標記的文章相同。你會得到：
+
+- 項目清單上方的**語言**欄與 *All Languages | English (n) | 繁體中文 (n)* 連結（會跟隨後台語言切換）；
+- 項目畫面上的語言，以及通知郵件中的 `Language:` 一行；
+- CSV 匯出最後一欄的**語言**（代碼），以及只匯出清單中所選語言的功能；
+- webhook 內容中的 `language` 欄位（語言代碼；若項目不依語言區分則為空字串）。
+
+
+- 自訂文章類型 `refine_entry`（選單**項目 Entries**）。中繼資料鍵：`_refinelab_lang`、`_refinelab_form_id`、`_refinelab_form_label`、`_refinelab_fields`（陣列）、`_refinelab_sender_email`、`_refinelab_sender_name`、`_refinelab_ip`、`_refinelab_user_agent`、`_refinelab_attachments`、`_refinelab_webhook`。
 - 從項目畫面**匯出 CSV**（`admin_post_refinelab_export_submissions_csv`）：大型清單會分批處理，且以 `=`、`+`、`-` 或 `@` 開頭的儲存格會被中和，試算表不會把它當作公式執行。
 - 舊版本的項目（文章類型 `refinelab_submission`）會自動遷移一次。
 
