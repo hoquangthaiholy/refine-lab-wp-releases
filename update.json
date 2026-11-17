@@ -1,11 +1,11 @@
 {
-  "version": "1.3.0",
-  "package": "https://github.com/hoquangthaiholy/refine-lab-wp-releases/releases/download/v1.3.0/refine-lab-wp-1.3.0.zip",
-  "sha256": "202ec0614fda9f8acf3c4b217494a8ba9135441e4b100048415ed4625fadb5f8",
+  "version": "1.4.0",
+  "package": "https://github.com/hoquangthaiholy/refine-lab-wp-releases/releases/download/v1.4.0/refine-lab-wp-1.4.0.zip",
+  "sha256": "55401a60d3d802d6a2a495272cc05cbcf2f8b161b77cfd035ba110b97b78ebef",
   "requires": "7.0",
   "released": "2026-11-17",
   "homepage": "https://refine-lab.com/",
   "sections": {
-    "changelog": "<h4>1.3.0</h4><ul><li>## 1.3.0</li><li>**New**</li><li>Scheduled full-site backups (daily / weekly / monthly) with retention and a failure e-mail.</li><li>Security: block PHP in the uploads folder (with a real \"Test now\" check), optional block on plugin/theme installs, and e-mail alerts for new-address admin sign-ins, lockouts, new admins and plugin/theme changes.</li><li>Site Health tests and a Debug Info section.</li><li>Performance: Heartbeat control, revision limit with cleanup, autosave interval.</li><li>HTML blocks: `&amp;&amp;`, `||`, parentheses, comparisons and `in` in conditions; `data-class`; `data-limit`, `data-offset`, `data-for-empty`; more `data-supports` panels.</li><li>Media: virtual folders in the native Media Library; Forms entries are split by language.</li><li>Docs in English and Traditional Chinese are updated.</li></ul>"
+    "changelog": "<h4>1.4.0</h4><ul><li>## 1.4.0</li><li>**Security**</li><li>Password policy (length, character mix, breached-password check), sign-out after inactivity, session limit.</li><li>Require two-factor by role with a grace period.</li><li>Content Security Policy (report-only or enforce) with a violation list.</li><li>**Performance**</li><li>Heartbeat/revision/autosave controls were already in 1.3; new: preconnect hints, Speculation Rules, asset removal by handle, database cleanup and autoload report, compression/caching snippets.</li><li>**Tools**</li><li>WP-CLI commands (`wp refinelab ...`).</li><li>Diagnostics page: cron manager, debug log viewer, optional e-mail log.</li><li>Live database search &amp; replace (dry run first), admin bar shortcuts.</li><li>**HTML blocks and editor**</li><li>Placeholder filters (`{{ x | upper }}`), number/radio/date/image controls, menu/query/post meta/terms context.</li><li>Partials, variations, template check with usage report.</li><li>Per-field typography and spacing, visibility per device, copy/paste block settings, outlines, command palette commands, accessibility check panel.</li><li>Docs in English and Traditional Chinese are updated.</li></ul>"
   }
 }
